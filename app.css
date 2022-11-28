@@ -34,6 +34,9 @@ h3 {
 p {
     font-weight: 100;
 }
+main {
+    display: none ;
+}
 
 /* Grid Styles */
 #grid {
