@@ -1,3 +1,4 @@
+//Read Dino 's data from dino.json
 async function readDataDino() {
   try {
     const res = await fetch("dino.json");
@@ -5,30 +6,6 @@ async function readDataDino() {
     return data;
   } catch (error) {
     console.log(error);
-  }
-}
-
-async function main() {
-  let dataDino;
-  const humanData = getHumanDetail();
-  dataDino = await readDataDino();
-  const dinoArr = createDinoList(dataDino.Dinos, "metric");
-  const errorMessage = document.getElementById("error-display");
-  if (humanData.name === "") {
-    errorMessage.innerHTML = "<p>Please enter a name</p>";
-    return;
-  } else if (humanData.height.inch < 1 || humanData.height.feet < 1) {
-    errorMessage.innerHTML = "<p>Please enter a height more than 0</p>";
-    return;
-  } else if (humanData.weight < 1) {
-    errorMessage.innerHTML = "<p>Please enter a weight more than 0</p>";
-    return;
-  } else {
-    // Remove form from screen
-    document.getElementById("dino-compare").style.display = "none";
-    document.getElementById("try-again").style.display = "block";
-    errorMessage.innerHTML = '';
-    addDataToGrid(dinoArr, humanData);
   }
 }
 
@@ -43,7 +20,7 @@ class Dino {
     this.dinoWhen = dinoDataSource.when;
     this.dinoFact = dinoDataSource.fact;
   }
-  // Create Dino Compare Method 1
+  // Create Dino Compare Method 1 - Compare Dino Height Against Human's height
   // NOTE: Weight in JSON file is in lbs, height in inches.
   compareDinoHeight(humanHeight) {
     const correctHeight = isNaN(humanHeight.inch)
@@ -68,7 +45,7 @@ class Dino {
     }
     return heightCompareResult;
   }
-  // Create Dino Compare Method 2
+  // Create Dino Compare Method 2 - Compare Dino Weight Against Human 's Weight
   // NOTE: Weight in JSON file is in lbs, height in inches.
   compareDinoWeight(humanWeight) {
     humanWeight = parseInt(humanWeight);
@@ -90,7 +67,8 @@ class Dino {
     }
     return weightCompareResult;
   }
-  // Create Dino Compare Method 3
+
+  // Create Dino Compare Method 3 - Compare Dino Diet Against Human 's Diet
   // NOTE: Weight in JSON file is in lbs, height in inches.
   compareDinoDiet(humanDiet) {
     const isAorAn = humanDiet === "Omnivore" ? "an" : "a";
@@ -102,8 +80,7 @@ class Dino {
   }
 }
 
-// };
-
+//Create Dino List's array by using Dino class 's constructor
 function createDinoList(dinoSource, unit) {
   const dinoList = [];
   if (dinoSource) {
@@ -117,7 +94,8 @@ function createDinoList(dinoSource, unit) {
   return dinoList;
 }
 
-class classHuman {
+//Class Human with Constructor
+class Human {
   constructor(name, height, weight, diet, unit) {
     this.name = name;
     this.height = {
@@ -129,15 +107,18 @@ class classHuman {
     this.unit = unit;
   }
 }
+//Reset input Inches when user types height value into Feet input
 function changeFeet() {
   document.getElementById("inches").value = "";
 }
+//Reset input Feet when user types height value into Inch input
 function changeInch() {
   document.getElementById("feet").value = "";
 }
 
+//Get Human's information from form and create Human Object.
 function getHumanDetail() {
-  // Create Human Object
+  //Get Human's information
   let humanInput = {
     name: document.getElementById("name").value,
     height: {
@@ -147,8 +128,8 @@ function getHumanDetail() {
     weight: document.getElementById("weight").value,
     diet: document.getElementById("diet").value,
   };
-
-  let humanData = new classHuman(
+  // Create Human Object
+  let humanData = new Human(
     humanInput.name,
     humanInput.height,
     humanInput.weight,
@@ -161,19 +142,11 @@ function getHumanDetail() {
   return humanData;
 }
 
-function compareFunc() {
-  const humanDetail = getHumanDetail();
-  if (humanDetail) {
-    document.getElementById("dino-compare").style.display = "none";
-    document.getElementById("grid").style.display = "block";
-  }
-}
-
 // Generate Tiles for each Dino in Array
 function createDinoItem(dinoData, humanData) {
   let fact;
   let random;
-
+  //Set a constant random number for Pigeon, otherwise is for dinosaurs by 2 facts and 3 methods.
   if (dinoData.dinoSpecies === "Pigeon") {
     random = 2;
   } else {
@@ -201,13 +174,14 @@ function createDinoItem(dinoData, humanData) {
     default:
       fact = "";
   }
+  // Create DOM Element for generate Dino's infor to UI
   let newDinoDiv = document.createElement("div");
   newDinoDiv.className = "grid-item";
   newDinoDiv.innerHTML = `<h3>${dinoData.dinoSpecies}
       </h3><img src="images/${dinoData.dinoSpecies}.png" alt="image of ${dinoData.species}"/><p>${fact}</p>`;
   return newDinoDiv;
 }
-
+//Generate Human to UI by creating DOM element
 function createHumanItem(human) {
   let newHumanDiv = document.createElement("div");
   newHumanDiv.className = "grid-item";
@@ -218,20 +192,38 @@ function createHumanItem(human) {
 function addDataToGrid(dinoArr, humanDt) {
   const gridView = document.getElementById("grid");
   for (let index = 0; index < 9; index++) {
-    if (index === 4) {
-      gridView.appendChild(createHumanItem(humanDt));
-    } else {
-      gridView.appendChild(createDinoItem(dinoArr[index], humanDt));
-    }
+    index === 4 ? gridView.appendChild(createHumanItem(humanDt)) : gridView.appendChild(createDinoItem(dinoArr[index], humanDt));
   }
 }
-
+//Async function to execute the readDataDino() and addDataToGrid, the inforgraphic executed after reading dino.json done.
+async function main() {
+  let dataDino;
+  const humanData = getHumanDetail();
+  dataDino = await readDataDino();
+  const dinoArr = createDinoList(dataDino.Dinos, "inch");
+  const errorMessage = document.getElementById("error-display");
+  if (humanData.name === "") {
+    errorMessage.innerHTML = "<p>Please enter a name</p>";
+    return;
+  } else if (humanData.height.inch < 1 || humanData.height.feet < 1) {
+    errorMessage.innerHTML = "<p>Please enter a height more than 0</p>";
+    return;
+  } else if (humanData.weight < 1) {
+    errorMessage.innerHTML = "<p>Please enter a weight more than 0</p>";
+    return;
+  } else {
+    // Remove form from screen
+    document.getElementById("dino-compare").style.display = "none";
+    document.getElementById("try-again").style.display = "block";
+    errorMessage.innerHTML = "";
+    addDataToGrid(dinoArr, humanData);
+  }
+}
 // On button click, prepare and display infographic
 function compareFunc() {
-  
   main();
 }
-
+//Re-Render Form to try with other user.
 function tryAgain() {
   document.getElementById("grid").innerHTML = null;
   document.getElementById("dino-compare").style.display = "block";
