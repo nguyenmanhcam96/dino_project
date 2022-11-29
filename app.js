@@ -24,6 +24,7 @@ async function main() {
     errorMessage.innerHTML = "<p>Please enter a weight more than 0</p>";
     return;
   } else {
+    // Remove form from screen
     document.getElementById("dino-compare").style.display = "none";
     document.getElementById("try-again").style.display = "block";
     errorMessage.innerHTML = '';
@@ -227,7 +228,7 @@ function addDataToGrid(dinoArr, humanDt) {
 
 // On button click, prepare and display infographic
 function compareFunc() {
-  // Remove form from screen
+  
   main();
 }
 
